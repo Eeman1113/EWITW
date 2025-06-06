@@ -7,21 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <!-- New, elegant font combination: Cormorant Garamond for headings, Inter for UI/body -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Elegant Brown Color Palette */
-            --color-bg-start: #f5f5dc; /* Parchment */
-            --color-bg-mid-1: #eaddca;
-            --color-bg-mid-2: #d3c5b9;
-            --color-bg-end: #c3b091;   /* Muted Beige */
+            /* New High-Contrast, Elegant Dark Palette */
+            --color-bg: #1a1a1a; /* Rich, near-black */
+            --color-bg-gradient-end: #2c2c2c; /* Softer charcoal */
+            --color-text-primary: #e8e6e3; /* Soft, ivory white */
+            --color-text-secondary: #a3a3a3; /* Muted gray for subtitles */
+            --color-accent: #d4c2a3; /* Muted gold accent */
+            --color-accent-hover: #ffffff;
             
-            --color-heading: #4e342e;  /* Darkest, rich brown */
-            --color-body: #5d4037;     /* Main readable brown */
-            --color-secondary: #795548; /* Lighter brown for subtitles */
-            --color-link: #8d6e63;      /* Muted brown for links */
-            --color-link-hover: #4e342e;/* Darkest brown for hover */
-            --color-ornament: rgba(93, 64, 55, 0.3);
+            /* New Font Families */
+            --font-heading: 'Cormorant Garamond', serif;
+            --font-body: 'Inter', sans-serif;
         }
 
         @keyframes gradient-fade {
@@ -36,25 +36,13 @@
         }
 
         body {
-            font-family: 'Lora', 'Times New Roman', Times, serif;
-            background: linear-gradient(-45deg, var(--color-bg-start), var(--color-bg-mid-1), var(--color-bg-mid-2), var(--color-bg-end));
+            font-family: var(--font-body);
+            background: linear-gradient(-45deg, var(--color-bg), var(--color-bg-gradient-end));
             background-size: 400% 400%;
             animation: gradient-fade 25s ease infinite;
-            color: var(--color-body);
-            position: relative;
-        }
-        
-        /* New: Subtle paper texture overlay */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAARlJREFUaIHtmOEKwzAIhP3/T5f2rNnD3gJdY6629kBCU3wft9NJHscDcb8bJp5lMplPfhx5sQyDDAwMDHwY+dCeZ+ZhcQ0MDBgYWGN0nOHd8XVgYGBgYGFkzM2M+gQGBgYGBpYQr+S+8Lq3gYGBgYGFgTcz6jOY8f8TjP4cRt5M6M9oxsDAwMDAwojHjGbsjYGBgYGBxYyP5K6Mj4GBgYGBhREfC+8rMxgYGBgYWBjzMnN+gYGBgYGFkSsz/gQGBgYGBhZCfC7f3gQGBgYGBhZGbGfcP2AgYGBgYGBkzEVmWQYGBgYGFkacDDxmdQMDAwMDw/8Z+S+Mj4GBgYFhmHkAeZtD84aV3goAAAAASUVORK5CYII=');
-            opacity: 0.08;
-            pointer-events: none;
+            color: var(--color-text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         #search-view, #result-view {
@@ -71,56 +59,80 @@
             animation: fade-in-up 1.2s ease-out forwards;
         }
 
-        #main-title { color: var(--color-heading); }
-        #prompt { color: var(--color-secondary); }
+        #main-title { 
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--color-text-primary);
+            text-shadow: 0 0 15px rgba(232, 230, 227, 0.1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        #prompt, #result-location {
+            font-family: var(--font-body);
+            font-weight: 300;
+            color: var(--color-text-secondary);
+        }
         
         #search-again-btn { 
-            color: var(--color-link);
-            transition: color 0.3s ease, letter-spacing 0.3s ease;
+            font-family: var(--font-body);
+            font-weight: 400;
+            color: var(--color-accent);
+            border: 1px solid var(--color-accent);
+            border-radius: 999px;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
         }
         #search-again-btn:hover { 
-            color: var(--color-link-hover);
-            letter-spacing: 0.05em;
+            background-color: var(--color-accent);
+            color: var(--color-bg);
+            transform: scale(1.05);
+        }
+        
+        #search-form {
+            transition: opacity 0.5s ease-out 0.3s;
         }
 
         #search-input {
+            font-family: var(--font-heading);
+            font-weight: 400;
             background: transparent;
             border: none;
-            border-bottom: 1px solid;
-            border-color: rgba(93, 64, 55, 0.3);
+            border-bottom: 1px solid rgba(163, 163, 163, 0.3);
             outline: none;
             text-align: center;
             width: 100%;
-            caret-color: var(--color-secondary);
+            caret-color: var(--color-accent);
             transition: border-color 0.3s ease;
-            color: var(--color-heading);
+            color: var(--color-text-primary);
         }
         #search-input:focus {
-             border-color: rgba(93, 64, 55, 0.7);
+             border-color: var(--color-accent);
         }
         
-        #result-location { color: var(--color-secondary); }
-        
-        /* New: Ornamental divider */
         .ornamental-divider {
             width: 100px;
             height: 20px;
-            margin: 1.5rem auto;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="20" viewBox="0 0 100 20"><path d="M0 10 L40 10 M60 10 L100 10 M45 5 L50 15 L55 5" fill="none" stroke="rgb(121, 85, 72)" stroke-opacity="0.5" stroke-width="1"/></svg>');
+            margin: 1rem auto 1.5rem auto;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="20" viewBox="0 0 100 20"><path d="M0 10 L40 10 M60 10 L100 10 M45 5 L50 15 L55 5" fill="none" stroke="rgb(212, 194, 163)" stroke-opacity="0.6" stroke-width="1"/></svg>');
             background-repeat: no-repeat;
             background-position: center;
         }
 
         #result-content {
+            font-family: var(--font-heading);
+            font-weight: 400;
             word-break: break-all; 
-            color: var(--color-body);
+            color: var(--color-text-primary);
+            text-shadow: 0 0 10px rgba(232, 230, 227, 0.05);
         }
         
         #result-content.is-address {
-            font-size: 1.875rem; /* 3xl */
-            line-height: 2.5rem;
+            font-family: var(--font-body);
+            font-weight: 300;
+            font-size: 1.5rem; /* 2xl */
+            line-height: 2.25rem;
             letter-spacing: 0.05em;
-            color: var(--color-secondary);
+            color: var(--color-text-secondary);
         }
 
     </style>
@@ -132,22 +144,22 @@
 
         <!-- Initial/Search View -->
         <div id="search-view" class="visible-view">
-            <h1 id="main-title" class="text-5xl md:text-6xl font-bold cursor-pointer transition-all duration-500">The Library of Babel</h1>
-            <p id="prompt" class="text-xl mt-4 opacity-0 transition-opacity duration-1000">Click anywhere to begin.</p>
-            <form id="search-form" class="mt-12 max-w-xl mx-auto opacity-0 transition-opacity duration-1000 pointer-events-none">
-                <input type="text" id="search-input" class="text-3xl p-2" autocomplete="off">
+            <h1 id="main-title" class="text-6xl md:text-7xl cursor-pointer">The Library of Babel</h1>
+            <p id="prompt" class="text-lg mt-6 opacity-0">Click anywhere to begin.</p>
+            <form id="search-form" class="mt-16 max-w-xl mx-auto opacity-0 pointer-events-none">
+                <input type="text" id="search-input" class="text-4xl p-2" autocomplete="off">
             </form>
         </div>
 
         <!-- Result View -->
         <div id="result-view" class="hidden-view w-full">
             <div class="w-full max-w-3xl mx-auto">
-                <p id="result-location" class="text-lg">Location</p>
+                <p id="result-location" class="text-base tracking-widest uppercase">Location</p>
                 <div class="ornamental-divider"></div>
-                <div id="result-content" class="text-3xl md:text-4xl font-light mb-16">
+                <div id="result-content" class="text-4xl md:text-5xl mb-16">
                     <!-- The generated text will appear here -->
                 </div>
-                <button id="search-again-btn" class="font-semibold py-2 px-4 text-lg">Search Again</button>
+                <button id="search-again-btn" class="text-lg">Search Again</button>
             </div>
         </div>
 
@@ -200,8 +212,8 @@
             const activateSearch = () => {
                 if (searchActive) return;
                 searchActive = true;
-                mainTitle.classList.remove('text-5xl', 'md:text-6xl');
-                mainTitle.classList.add('text-4xl', 'md:text-5xl');
+                mainTitle.classList.remove('text-6xl', 'md:text-7xl');
+                mainTitle.classList.add('text-5xl', 'md:text-6xl');
                 promptText.textContent = "Enter text or an address below."
                 promptText.style.opacity = '1';
                 searchForm.style.opacity = '1';
@@ -215,15 +227,13 @@
                 if (query.trim() === '') return;
                 
                 if (isNumeric(query)) {
-                    // Address to Text
                     const text = addressToText(query);
                     if (text.startsWith('Error:')) {
                         showResultView("Error", text, false);
                     } else {
-                        showResultView(`Page found at address: ${query}`, text, false);
+                        showResultView(`Page found at address:`, text, false);
                     }
                 } else {
-                    // Text to Address
                     const address = textToAddress(query);
                     if (address.startsWith('Error:')) {
                         showResultView("Error", address, false);
