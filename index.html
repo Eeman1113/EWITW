@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Library of Babel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Elegant Brown Color Palette */
+            --color-bg-start: #f5f5dc; /* Parchment */
+            --color-bg-mid-1: #eaddca;
+            --color-bg-mid-2: #d3c5b9;
+            --color-bg-end: #c3b091;   /* Muted Beige */
+            
+            --color-heading: #4e342e;  /* Darkest, rich brown */
+            --color-body: #5d4037;     /* Main readable brown */
+            --color-secondary: #795548; /* Lighter brown for subtitles */
+            --color-link: #8d6e63;      /* Muted brown for links */
+            --color-link-hover: #4e342e;/* Darkest brown for hover */
+            --color-ornament: rgba(93, 64, 55, 0.3);
+        }
+
+        @keyframes gradient-fade {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            font-family: 'Lora', 'Times New Roman', Times, serif;
+            background: linear-gradient(-45deg, var(--color-bg-start), var(--color-bg-mid-1), var(--color-bg-mid-2), var(--color-bg-end));
+            background-size: 400% 400%;
+            animation: gradient-fade 25s ease infinite;
+            color: var(--color-body);
+            position: relative;
+        }
+        
+        /* New: Subtle paper texture overlay */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAARlJREFUaIHtmOEKwzAIhP3/T5f2rNnD3gJdY6629kBCU3wft9NJHscDcb8bJp5lMplPfhx5sQyDDAwMDHwY+dCeZ+ZhcQ0MDBgYWGN0nOHd8XVgYGBgYGFkzM2M+gQGBgYGBpYQr+S+8Lq3gYGBgYGFgTcz6jOY8f8TjP4cRt5M6M9oxsDAwMDAwojHjGbsjYGBgYGBxYyP5K6Mj4GBgYGBhREfC+8rMxgYGBgYWBjzMnN+gYGBgYGFkSsz/gQGBgYGBhZCfC7f3gQGBgYGBhZGbGfcP2AgYGBgYGBkzEVmWQYGBgYGFkacDDxmdQMDAwMDw/8Z+S+Mj4GBgYFhmHkAeZtD84aV3goAAAAASUVORK5CYII=');
+            opacity: 0.08;
+            pointer-events: none;
+        }
+        
+        #search-view, #result-view {
+            transition: opacity 1s ease-in-out;
+        }
+
+        .hidden-view {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+        }
+        
+        .visible-view {
+            animation: fade-in-up 1.2s ease-out forwards;
+        }
+
+        #main-title { color: var(--color-heading); }
+        #prompt { color: var(--color-secondary); }
+        
+        #search-again-btn { 
+            color: var(--color-link);
+            transition: color 0.3s ease, letter-spacing 0.3s ease;
+        }
+        #search-again-btn:hover { 
+            color: var(--color-link-hover);
+            letter-spacing: 0.05em;
+        }
+
+        #search-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid;
+            border-color: rgba(93, 64, 55, 0.3);
+            outline: none;
+            text-align: center;
+            width: 100%;
+            caret-color: var(--color-secondary);
+            transition: border-color 0.3s ease;
+            color: var(--color-heading);
+        }
+        #search-input:focus {
+             border-color: rgba(93, 64, 55, 0.7);
+        }
+        
+        #result-location { color: var(--color-secondary); }
+        
+        /* New: Ornamental divider */
+        .ornamental-divider {
+            width: 100px;
+            height: 20px;
+            margin: 1.5rem auto;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="20" viewBox="0 0 100 20"><path d="M0 10 L40 10 M60 10 L100 10 M45 5 L50 15 L55 5" fill="none" stroke="rgb(121, 85, 72)" stroke-opacity="0.5" stroke-width="1"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        #result-content {
+            word-break: break-all; 
+            color: var(--color-body);
+        }
+        
+        #result-content.is-address {
+            font-size: 1.875rem; /* 3xl */
+            line-height: 2.5rem;
+            letter-spacing: 0.05em;
+            color: var(--color-secondary);
+        }
+
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <!-- The main container for our app states -->
+    <div id="app" class="w-full max-w-4xl text-center">
+
+        <!-- Initial/Search View -->
+        <div id="search-view" class="visible-view">
+            <h1 id="main-title" class="text-5xl md:text-6xl font-bold cursor-pointer transition-all duration-500">The Library of Babel</h1>
+            <p id="prompt" class="text-xl mt-4 opacity-0 transition-opacity duration-1000">Click anywhere to begin.</p>
+            <form id="search-form" class="mt-12 max-w-xl mx-auto opacity-0 transition-opacity duration-1000 pointer-events-none">
+                <input type="text" id="search-input" class="text-3xl p-2" autocomplete="off">
+            </form>
+        </div>
+
+        <!-- Result View -->
+        <div id="result-view" class="hidden-view w-full">
+            <div class="w-full max-w-3xl mx-auto">
+                <p id="result-location" class="text-lg">Location</p>
+                <div class="ornamental-divider"></div>
+                <div id="result-content" class="text-3xl md:text-4xl font-light mb-16">
+                    <!-- The generated text will appear here -->
+                </div>
+                <button id="search-again-btn" class="font-semibold py-2 px-4 text-lg">Search Again</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Configuration ---
+            const characterSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,;:'\"?!@#$%^&*()[]{}<>-_+=|\\/`~ ";
+            const base = BigInt(characterSet.length);
+            const charMap = new Map(Array.from(characterSet).map((char, i) => [char, BigInt(i)]));
+
+            // --- UI Elements ---
+            const searchView = document.getElementById('search-view');
+            const resultView = document.getElementById('result-view');
+            const mainTitle = document.getElementById('main-title');
+            const promptText = document.getElementById('prompt');
+            const searchForm = document.getElementById('search-form');
+            const searchInput = document.getElementById('search-input');
+            const resultLocation = document.getElementById('result-location');
+            const resultContent = document.getElementById('result-content');
+            const searchAgainBtn = document.getElementById('search-again-btn');
+
+            let searchActive = false;
+
+            // --- Functions ---
+            const showSearchView = () => {
+                resultView.classList.add('hidden-view');
+                resultView.classList.remove('visible-view');
+                searchView.classList.remove('hidden-view');
+                searchView.classList.add('visible-view');
+                searchInput.value = '';
+                if(searchActive) {
+                    searchInput.focus();
+                }
+            };
+
+            const showResultView = (location, content, isAddress) => {
+                resultLocation.textContent = location;
+                resultContent.textContent = content;
+
+                resultContent.classList.toggle('is-address', isAddress);
+                
+                searchView.classList.add('hidden-view');
+                searchView.classList.remove('visible-view');
+                resultView.classList.remove('hidden-view');
+                resultView.classList.add('visible-view');
+            };
+
+            const activateSearch = () => {
+                if (searchActive) return;
+                searchActive = true;
+                mainTitle.classList.remove('text-5xl', 'md:text-6xl');
+                mainTitle.classList.add('text-4xl', 'md:text-5xl');
+                promptText.textContent = "Enter text or an address below."
+                promptText.style.opacity = '1';
+                searchForm.style.opacity = '1';
+                searchForm.classList.remove('pointer-events-none');
+                setTimeout(() => searchInput.focus(), 500);
+            };
+
+            const isNumeric = (str) => /^\d+$/.test(str) && str.length > 0;
+
+            const handleSearch = (query) => {
+                if (query.trim() === '') return;
+                
+                if (isNumeric(query)) {
+                    // Address to Text
+                    const text = addressToText(query);
+                    if (text.startsWith('Error:')) {
+                        showResultView("Error", text, false);
+                    } else {
+                        showResultView(`Page found at address: ${query}`, text, false);
+                    }
+                } else {
+                    // Text to Address
+                    const address = textToAddress(query);
+                    if (address.startsWith('Error:')) {
+                        showResultView("Error", address, false);
+                    } else {
+                        showResultView(`This page's address is:`, address, true);
+                    }
+                }
+            };
+
+            // --- Core Logic (no changes needed) ---
+            function textToAddress(text) {
+                for (const char of text) {
+                    if (!charMap.has(char)) return `Error: Character '${char}' is not in the library's alphabet.`;
+                }
+                const length = text.length;
+                let address = 0n, offset = 0n, positionInBlock = 0n;
+                for (let i = 1; i < length; i++) offset += base ** BigInt(i);
+                for (let i = 0; i < length; i++) positionInBlock += charMap.get(text[i]) * (base ** BigInt(length - 1 - i));
+                return (address + offset + positionInBlock).toString();
+            }
+
+            function addressToText(addressStr) {
+                let address;
+                try {
+                    address = BigInt(addressStr);
+                    if (address < 0n) throw new Error();
+                } catch (e) { return "Error: Address must be a valid non-negative integer."; }
+
+                let length = 1, combinationsAtLength = base, totalCombinationsSoFar = 0n;
+                while (address >= totalCombinationsSoFar + combinationsAtLength) {
+                    totalCombinationsSoFar += combinationsAtLength;
+                    length++;
+                    combinationsAtLength *= base;
+                }
+                let positionInBlock = address - totalCombinationsSoFar;
+                let result = '';
+                for (let i = length - 1; i >= 0; i--) {
+                    const powerOfBase = base ** BigInt(i);
+                    const charIndex = positionInBlock / powerOfBase;
+                    result += characterSet[Number(charIndex)];
+                    positionInBlock %= powerOfBase;
+                }
+                return result;
+            }
+
+            // --- Event Listeners ---
+            document.body.addEventListener('click', (e) => {
+                if (!searchActive && e.target.tagName !== 'INPUT') {
+                   activateSearch();
+                }
+            });
+
+            searchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleSearch(searchInput.value);
+            });
+            
+            searchAgainBtn.addEventListener('click', showSearchView);
+        });
+    </script>
+</body>
+</html>
